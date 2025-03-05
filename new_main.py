@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import pandas as pd
 
@@ -6,11 +7,11 @@ import tkinter as tk
 from tkinter import filedialog, ttk
 from tkcalendar import Calendar
 
-from smartphar import open_smartphar, login_smartphar
+from smartphar import open_smartphar, login_smartphar, open_receitas_screen
 
 # Legado
 import ajuste_dataframe
-from smartphar import filter_manipulados, incluir_smart
+from smartphar import filter_manipulados, insert_orders_smartphar
 
 def select_folder(folder_label):
     folder_selected = filedialog.askdirectory()
@@ -34,6 +35,9 @@ def merge_excel_files(folder_path):
 
         if 'filtered_orders.xlsx' in os.listdir(folder_path):
             os.remove(folder_path + "/" + 'filtered_orders.xlsx')
+
+        if 'pedidos.xlsx' in os.listdir(folder_path):
+            os.remove(folder_path + "/" + 'pedidos.xlsx')
 
         for file in os.listdir(folder_path):
             if file.endswith('.xlsx') or file.endswith('.xls'):
@@ -67,14 +71,13 @@ def build_dataframe(folder_path, unmanufactured_products):
 
     #Converte a coluna codigo da base de dados para inteiro
     unmanufactured_products = unmanufactured_products[unmanufactured_products['codigo'] != 'folder_sac']
-    # unmanufactured_products["codigo"] = unmanufactured_products["codigo"].astype(int)
+    unmanufactured_products["codigo"] = unmanufactured_products["codigo"].astype(int)
 
     #Mescla a planilha de pedidos com a base de dados para filtrar os pedidos semi-acabados
     filtered_orders = pd.merge(orders, unmanufactured_products, left_on="Código (SKU)", right_on="codigo", how="left")
 
     #Ajusta os dados do dataframe
     ajuste_dataframe.ajuste_excel(filtered_orders)
-    print(filtered_orders)
 
     # #Armazena os pedidos manipulados
     filtered_orders["tipoInterno"] = filtered_orders["tipoInterno"].str.strip()
@@ -97,9 +100,15 @@ def include_reqs(folder_path, sector_var):
     unmanufactured_products = get_unmanufactured_products()    
     build_dataframe(folder_path, unmanufactured_products)
     smart_filtered_orders = filter_manipulados(folder_path)
-    print(smart_filtered_orders)
+    
+    # Open and login to Smartphar
     open_smartphar()
+    # time.sleep(1)
     login_smartphar()
+    time.sleep(2)
+    open_receitas_screen()
+    time.sleep(2)
+    insert_orders_smartphar(smart_filtered_orders)
 
 
 
@@ -153,4 +162,3 @@ def main():
     root.mainloop()
 
 main()
-# open_smartphar()

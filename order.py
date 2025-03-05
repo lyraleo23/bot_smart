@@ -6,3 +6,7 @@ class Order:
         self.order_number = order_number
         self.qtd = qtd
         self.phone = phone
+
+    def __str__(self):
+        return f"SKU: {self.sku}, Name: {self.name}, CPF: {self.cpf}, Order Number: {self.order_number}, Qtd: {self.qtd}, Phone: {self.phone}"
+    

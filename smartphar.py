@@ -14,8 +14,6 @@ def open_smartphar():
     pgui.press("left")
     pgui.press("enter")
     time.sleep(5)
-    login_smartphar()
-    open_receitas_screen()
 
 
 def login_smartphar():
@@ -56,7 +54,31 @@ def filter_manipulados(folder_path):
     return smart_filtered_orders
 
 
-def incluir_smart(smart_filtered_orders):
+def click_incluir_normal():
+    pgui.moveTo(incluir_icon_location['x'], incluir_icon_location['y'])
+    pgui.click()
+    time.sleep(1)
+
+
+def click_nova_receita_outra_requisicao():
+    pgui.moveTo(nova_receita_via_outra_requisicao_location['x'], nova_receita_via_outra_requisicao_location['y'])
+    pgui.click()
+    time.sleep(1)
+    pgui.press("enter")
+
+
+def pesquisar_requisicao_inclusao_via_outra_receita():
+    # TODO: Implement this function
+    pgui.moveTo(440,330)
+    pgui.doubleClick()
+    pgui.press('backspace')
+    time.sleep(0.5)
+    pgui.write(cod_item)
+    pgui.press('enter')
+    time.sleep(1)
+
+
+def insert_orders_smartphar(smart_filtered_orders):
     # Variables to receive order number and reqs
     previous_order_number = None
     previous_order_number = str(previous_order_number)
@@ -72,32 +94,35 @@ def incluir_smart(smart_filtered_orders):
         phone = smart_filtered_orders["Fone"].iloc[i]
         
         order = Order(sku, name, cpf, order_number, qtd, phone)
+        print(order)
         
-        if order[order_number] != previous_order_number:
-            while True:
-                #Clica no botão de Incluir Normal
-                time.sleep(1)
-                pgui.moveTo(450,130)
-                pgui.click()
-                time.sleep(1)
+        # if order[order_number] != previous_order_number:
+        while True:
+            # Clica no botão de Incluir Normal
+            time.sleep(1)
+            click_incluir_normal()                
 
-                #Verifica se está na tela correta
-                tela_incluir = pgui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
+            # Verifica se está na tela correta
+            tela_incluir = pgui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
+            
+            # Caso não esteja na tela correta, abre o smart novamente
+            if tela_incluir == None:
+                open_smartphar()
+                login_smartphar()
+                open_receitas_screen()
+            else:
+                break
+
+        # Clica em Nova Receita via outra requisição
+        click_nova_receita_outra_requisicao()
+
+        pesquisar_requisicao_inclusao_via_outra_receita()
+
+            
+        break
                 
-                if tela_incluir == None:
-                    #Caso não esteja na tela correta, abre o smart novamente
-                    funcoes_pgui.tela_inclusao(tela_incluir)
                 
-                #Clica em Nova Receita via outra requisição
-                pgui.moveTo(228,440)
-                pgui.click()
-                time.sleep(0.5)
-                
-                #Clica no Botão OK
-                pgui.moveTo(440,780)
-                pgui.click()
-                time.sleep(0.5)
-                
+
                 #Inclui o número da req
                 pgui.moveTo(440,330)
                 pgui.doubleClick()
@@ -444,19 +469,17 @@ def incluir_smart(smart_filtered_orders):
         #Armazena o número do pedido como o anterior para verificação
         num_pedido_ant = num_ped
         
-        #Armazena a hora para criação de log
-        hora = datetime.now()
+    #     #Armazena a hora para criação de log
+    #     hora = datetime.now()
         
-        #Criação de log
-        log = "\nHora: {}, Pedido: {}, Cliente: {}, CPF Cliente: {} ,REQ: {}, Data Smart: {}".format(hora, num_ped, nome_cli, cpf_cli, req, data_producao)
-        with open(f'log/log{data_producao}.txt', 'a') as arquivo:
-            arquivo.write(str(log))
+    #     #Criação de log
+    #     log = "\nHora: {}, Pedido: {}, Cliente: {}, CPF Cliente: {} ,REQ: {}, Data Smart: {}".format(hora, num_ped, nome_cli, cpf_cli, req, data_producao)
+    #     with open(f'log/log{data_producao}.txt', 'a') as arquivo:
+    #         arquivo.write(str(log))
     
-    janela_final = tk.Tk()
-    janela_final.title("Finalizado")
-    janela_final.geometry("1330x200")
-    tk.Label(janela_final, text="Pedidos Incluídos", font=("Helvetica", 90, "bold")).place(x=10, y=20)
-    janela_final.wm_attributes('-topmost', True)
-    janela_final.mainloop()
-
-open_smartphar()
+    # janela_final = tk.Tk()
+    # janela_final.title("Finalizado")
+    # janela_final.geometry("1330x200")
+    # tk.Label(janela_final, text="Pedidos Incluídos", font=("Helvetica", 90, "bold")).place(x=10, y=20)
+    # janela_final.wm_attributes('-topmost', True)
+    # janela_final.mainloop()
