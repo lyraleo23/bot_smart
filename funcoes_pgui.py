@@ -1,7 +1,7 @@
 import pyautogui as pgui
 import time
 
-kits = ["430035", "396864", "702310"]
+kits = kits = ["430035", "396864", "702310"]
 
 def tratamento(cod_item):
     #Verifica se o item é tratamento para unhas

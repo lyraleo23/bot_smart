@@ -19,7 +19,7 @@ def select_folder(folder_label):
     return folder_selected
 
 
-def merge_excel_files(folder_path):
+def merge_excel_files(folder_path, total_pedidos_label, total_requisicoes_label):
     print(folder_path)
     if not folder_path:
         print('Error: No folder selected')
@@ -47,6 +47,15 @@ def merge_excel_files(folder_path):
         
         combined_df.to_excel(folder_path + "/" + output_file, index=False)
         print('Files merged!')
+
+        unmanufactured_products = get_unmanufactured_products()    
+        total_pedidos, total_requisicoes = build_dataframe(folder_path, unmanufactured_products)
+
+        def update_production_total():
+            total_pedidos_label.config(text=f'Total pedidos: {total_pedidos}')
+            total_requisicoes_label.config(text=f'Total reqs: {total_requisicoes}')
+
+        update_production_total()
         return
 
 
@@ -83,7 +92,7 @@ def build_dataframe(folder_path, unmanufactured_products):
     filtered_orders["tipoInterno"] = filtered_orders["tipoInterno"].str.strip()
     filtered_orders["tipoInterno"] = filtered_orders["tipoInterno"].str.lower()
     manipulados = filtered_orders[filtered_orders["tipoInterno"].isin(["manipulado"])]
-    print(manipulados)
+
     #Soma a quantidade de reqs e pedidos
     total_pedidos = manipulados["Número do pedido"].drop_duplicates()
     total_pedidos = total_pedidos.count()
@@ -93,23 +102,24 @@ def build_dataframe(folder_path, unmanufactured_products):
     print(f'Total Requisições: {total_requisicoes}')
 
     filtered_orders.to_excel(folder_path + "/" + 'filtered_orders.xlsx', index=False)
-    return 
+    return total_pedidos, total_requisicoes
+        
 
-
-def include_reqs(folder_path, sector_var):
-    unmanufactured_products = get_unmanufactured_products()    
-    build_dataframe(folder_path, unmanufactured_products)
+def include_reqs(folder_path, sector_var, production_branch):
+    # Filter orders
     smart_filtered_orders = filter_manipulados(folder_path)
     
     # Open and login to Smartphar
     open_smartphar()
-    # time.sleep(1)
-    login_smartphar()
+    login_smartphar(production_branch)
     time.sleep(2)
+
+    # Open receitas screen
     open_receitas_screen()
     time.sleep(2)
-    insert_orders_smartphar(smart_filtered_orders)
 
+    # Insert orders
+    insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch)
 
 
 def main():
@@ -124,16 +134,8 @@ def main():
     folder_button.pack(pady=5)
 
     # Merge button
-    merge_button = tk.Button(root, text="Merge Excel Files", command=lambda: merge_excel_files(folder_path.get()))
+    merge_button = tk.Button(root, text="Merge Excel Files", command=lambda: merge_excel_files(folder_path.get(), total_pedidos_label, total_requisicoes_label))
     merge_button.pack(pady=20)
-
-    #Rótulos de quantidades de pedidos com base na analise dos pedidos
-    total_pedidos_label = tk.Label(root, text="Total pedidos: ")
-    total_pedidos_label.pack(pady=5)
-
-    #Rótulos de quantidades de reqs com base na analise dos pedidos
-    total_requisicoes_label = tk.Label(root, text="Total reqs: ")
-    total_requisicoes_label.pack(pady=5)
 
     # Date selector
     cal_label = tk.Label(root, text="Select Date")
@@ -147,16 +149,31 @@ def main():
         print(production_date.get())
 
     cal.bind("<<CalendarSelected>>", update_production_date)
+
+    #Rótulos de quantidades de pedidos com base na analise dos pedidos
+    total_pedidos_label = tk.Label(root, text="Total pedidos: ")
+    total_pedidos_label.pack(pady=5)
+
+    #Rótulos de quantidades de reqs com base na analise dos pedidos
+    total_requisicoes_label = tk.Label(root, text="Total reqs: ")
+    total_requisicoes_label.pack(pady=5)
     
-    # Option selector
-    sector_label = tk.Label(root, text="Select Option")
+    # Setor selector
+    sector_label = tk.Label(root, text="Selecione o setor")
     sector_label.pack(pady=5)
     sector_var = tk.StringVar(value="Site")
     sector_menu = ttk.Combobox(root, textvariable=sector_var, values=["Site", "Manual"])
     sector_menu.pack(pady=5)
 
+    # Setor filial de produção
+    production_branch_label = tk.Label(root, text="Selecione a filial de produção")
+    production_branch_label.pack(pady=5)
+    production_branch_var = tk.StringVar(value="100")
+    production_branch_menu = ttk.Combobox(root, textvariable=production_branch_var, values=["100", "600"])
+    production_branch_menu.pack(pady=5)
+
     # Run button
-    merge_button = tk.Button(root, text="Run", command=lambda: include_reqs(folder_path.get(), sector_var.get()))
+    merge_button = tk.Button(root, text="Run", command=lambda: include_reqs(folder_path.get(), sector_var.get(), production_branch_var.get()))
     merge_button.pack(pady=20)
     
     root.mainloop()
