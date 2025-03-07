@@ -1,57 +1,61 @@
 import time
 import pandas as pd
-import pyautogui as pgui
+import pyautogui
 from order import Order
 from locations import *
+
+pyautogui.PAUSE = 0.2
 
 
 def open_smartphar():
     # Windows Run
-    pgui.hotkey("win", "r")
-    pgui.write(r"\\10.1.1.5\j\smartpharmacy\SmartPhar.exe")
-    pgui.press("enter")
+    pyautogui.hotkey("win", "r")
+    pyautogui.write(r"\\10.1.1.5\j\smartpharmacy\SmartPhar.exe")
+    pyautogui.press("enter")
     time.sleep(2)
-    pgui.press("left")
-    pgui.press("enter")
+    pyautogui.press("left")
+    pyautogui.press("enter")
     time.sleep(5)
 
 
 def login_smartphar(production_branch):
     # Insert login
-    pgui.write("MILIBOT")
-    pgui.press('TAB')
-    pgui.press('TAB')
+    pyautogui.write("MILIBOT")
+    pyautogui.press('TAB')
+    pyautogui.press('TAB')
 
     # Insert password
-    pgui.write('77777777')
-    pgui.press('TAB')
+    pyautogui.write('77777777')
+    pyautogui.press('TAB')
 
     # Select branch
     if production_branch == '100':
-        pgui.write
-        pgui.press('down')
-        pgui.press('down')
-        pgui.press('down')
-        pgui.press('down')
-        pgui.press('down')
-        pgui.press('enter')
+        pyautogui.write
+        for _ in range(5):
+            pyautogui.press('down')
+        pyautogui.press('enter')
     elif production_branch == '600':
-        pgui.write
-        pgui.press('down')
-        pgui.press('enter')
+        pyautogui.write
+        pyautogui.press('down')
+        pyautogui.press('enter')
     
     time.sleep(2)
-    pgui.press('enter')
-    pgui.press('enter')
+    pyautogui.press('enter')
+    pyautogui.press('enter')
     time.sleep(2)
-    pgui.press('enter')
+    pyautogui.press('enter')
 
 
 def open_receitas_screen():
-    receita_icon = pgui.locateOnScreen("imagens/receita_smart.png", confidence=0.5)
-    if receita_icon != None:
-        pgui.moveTo(receita_icon_location['x'], receita_icon_location['y'])
-        pgui.click()
+    # receita_icon = pyautogui.locateOnScreen("imagens/receita_smart.png", confidence=0.5)
+    # if receita_icon != None:
+    #     pyautogui.moveTo(receita_icon_location['x'], receita_icon_location['y'])
+    #     pyautogui.click()
+    pyautogui.keyDown('ctrl')
+    pyautogui.keyDown('r')
+    time.sleep(0.1)
+    pyautogui.keyUp('ctrl')
+    pyautogui.keyUp('r')
 
 
 def filter_manipulados(folder_path):
@@ -66,22 +70,20 @@ def filter_manipulados(folder_path):
 
 
 def click_incluir_normal():
-    pgui.moveTo(incluir_icon_location['x'], incluir_icon_location['y'])
-    pgui.click()
-    time.sleep(1)
+    pyautogui.hotkey('alt', 'i')
 
 
 def click_nova_receita_via_outra_requisicao():
-    pgui.press("down")
-    pgui.press("down")
-    pgui.press("down")
-    pgui.press("enter")
+    pyautogui.press("down")
+    pyautogui.press("down")
+    pyautogui.press("down")
+    pyautogui.press("enter")
 
 
 def click_sequencial_outra_requisicao():
-    pgui.press("down")
-    pgui.press("down")
-    pgui.press("enter")
+    pyautogui.press("down")
+    pyautogui.press("down")
+    pyautogui.press("enter")
 
 
 def verificar_kit(sku):
@@ -93,18 +95,123 @@ def verificar_kit(sku):
 
 
 def pesquisar_requisicao_inclusao_via_outra_receita(sku):
-    pgui.moveTo(fied_receita_via_outra_requisicao_numero_req_location['x'], fied_receita_via_outra_requisicao_numero_req_location['y'])
-    pgui.doubleClick()
-    pgui.press('backspace')
+    pyautogui.moveTo(fied_receita_via_outra_requisicao_numero_req_location['x'], fied_receita_via_outra_requisicao_numero_req_location['y'])
+    pyautogui.doubleClick()
+    pyautogui.press('backspace')
     time.sleep(0.2)
-    pgui.write(sku)
-    pgui.press('enter')
+    pyautogui.write(sku)
+    pyautogui.press('enter')
     time.sleep(0.5)
-    pgui.press('enter')
+    pyautogui.press('enter')
     time.sleep(1)
 
 
-def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch):
+def verify_error_dinamica():
+    try:
+        error_dinamica = pyautogui.locateOnScreen('imagens/erro_dinamica.PNG', confidence=0.8)
+    except:
+        error_dinamica = None
+    
+    return error_dinamica
+
+
+def click_alterar():
+    pyautogui.hotkey('alt', 'a')
+    pyautogui.press('tab')
+
+
+def transformar_or():
+    pyautogui.write('OR')
+    pyautogui.press('tab')
+    pyautogui.press('tab')
+    pyautogui.press('tab')
+
+
+def altera_data_hora_entrega(production_date):
+    # Altera data
+    pyautogui.write(production_date)
+    pyautogui.press('tab')
+    
+    # Hora de entrega fix em 16:30
+    pyautogui.write('163000')
+    time.sleep(0.5)
+
+
+def search_customer(cpf):
+    pyautogui.press('enter')
+    pyautogui.hotkey('ctrl', 'a')
+    pyautogui.write(cpf)
+    pyautogui.press('enter')
+    time.sleep(1)
+
+    #verifica se cliente possui cadastro
+    try:
+        customer_verification = pyautogui.locateOnScreen('imagens/referencia.png', confidence=0.8)
+    except:
+        customer_verification = None
+
+    if customer_verification == None:
+        pyautogui.press('enter')
+    else:
+        pyautogui.press('esc')
+        time.sleep(0.2)
+
+    return customer_verification
+
+        
+def cadastrar_cliente(name, cpf, phone):
+    pyautogui.press('insert')
+    time.sleep(1)
+    pyautogui.press('tab')
+    pyautogui.write(name)
+    for _ in range(4):
+        pyautogui.press('tab')
+    pyautogui.write(cpf)
+    for _ in range(6):
+        pyautogui.press('tab')
+    pyautogui.write('M')
+    for _ in range(9):
+        pyautogui.press('tab')
+    pyautogui.write(phone)
+    
+    pyautogui.hotkey('alt', 'g')
+
+
+def incluir_crm(crm):
+    for _ in range(9):
+        pyautogui.press('tab')
+    pyautogui.write(crm)
+    pyautogui.press('enter')
+
+
+def ajustar_quantidade(qtd):
+    for _ in range(12):
+        pyautogui.press('tab')
+    pyautogui.write(qtd)
+    pyautogui.press('F9')
+    time.sleep(0.5)
+    for _ in range(3):
+        pyautogui.press('enter')
+
+
+def save_req():
+    pyautogui.hotkey('alt', 'g')
+    pyautogui.press('enter')
+    pyautogui.press('right')
+    pyautogui.press('enter')
+
+
+def ajustar_quantidade_manual(qtd):
+    for _ in range(3):
+        pyautogui.press('tab')
+    pyautogui.write(qtd)
+    pyautogui.press('F9')
+    time.sleep(0.5)
+    for _ in range(3):
+        pyautogui.press('enter')
+
+
+def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch, production_date):
     # Variables to receive order number and reqs
     previous_order_number = None
     error = None
@@ -122,25 +229,29 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
         
         order = Order(sku, name, cpf, order_number, qtd, phone)
         print(order)
-        print(f'ERROR: {error}')
+        print(f'ERROR entrada: {error}')
 
         if error == 'dinamica':
             if order.order_number == previous_order_number:
                 continue
             else:
                 error = None
+        
+        print(f'ERROR saida: {error}') 
 
         if order.order_number != previous_order_number:
             while True:
                 try:
                     # Clica no botão de Incluir Normal
                     time.sleep(1)
-                    click_incluir_normal()                
+                    click_incluir_normal()
+                    time.sleep(2)
 
                     # Verifica se está na tela correta
-                    tela_incluir = pgui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
+                    tela_incluir = pyautogui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
                 except Exception as e:
                     print('Erro')
+                    tela_incluir = None
 
                 # Caso não esteja na tela correta, abre o smart novamente
                 if tela_incluir == None:
@@ -156,7 +267,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
             
         elif order.order_number == previous_order_number:
             # Verifica se está na tela correta
-            tela_incluir = pgui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
+            tela_incluir = pyautogui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
 
             if tela_incluir == None:
                 open_smartphar()
@@ -174,7 +285,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
         previous_order_number = order.order_number
         
         #Verifica se possui erro de dinamica
-        error_dinamica = pgui.locateOnScreen('imagens/dinamica2.png', confidence=0.4)
+        error_dinamica = verify_error_dinamica()
 
         if error_dinamica != None:
             print('ERROR: dinamica!')
@@ -186,41 +297,75 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
             orders_errors.append(e)
 
             # Fecha a tela de erro
-            pgui.press('esc')
+            pyautogui.press('esc')
             continue
         
         # Confirma item
-        pgui.press('enter')
-        pgui.press('enter')
+        pyautogui.press('enter')
+        pyautogui.press('enter')
+        time.sleep(2)
 
+        # Clica em alterar req
+        click_alterar()
+
+        if sector_var == 'Manual':
+            crm = smart_filtered_orders["Observações"].iloc[i]
+            incluir_crm(str(crm))
+            if qtd > 1:
+                ajustar_quantidade_manual(order.qtd)
+        else:
+            if qtd > 1:
+                ajustar_quantidade(order.qtd)
+        
+        save_req()
         print('Sequencial incluída com sucesso!')
+        time.sleep(2)
+
+        next_order_number = smart_filtered_orders["Número do pedido"].iloc[i+1]
+        if order.order_number != next_order_number:
+            click_alterar()
+            transformar_or()
+            altera_data_hora_entrega(production_date)
+            pyautogui.press('tab')
+            pyautogui.press('tab')
+            customer_verification = search_customer(order.cpf)
+
+            if customer_verification != None:
+                cadastrar_cliente(order.name, order.cpf, order.phone)
+
+            
+
+                
+                
+
+            
                 
                 
 
         #         #Inclui o número da req
-        #         pgui.moveTo(440,330)
-        #         pgui.doubleClick()
-        #         pgui.press('backspace')
+        #         pyautogui.moveTo(440,330)
+        #         pyautogui.doubleClick()
+        #         pyautogui.press('backspace')
         #         time.sleep(0.5)
-        #         pgui.write(cod_item)
-        #         pgui.press('enter')
+        #         pyautogui.write(cod_item)
+        #         pyautogui.press('enter')
         #         time.sleep(1)
                 
         #         #Verifica se o produto é um kit
-        #         funcoes_pgui.tratamento(cod_item)
+        #         funcoes_pyautogui.tratamento(cod_item)
         #         time.sleep(0.5)
                 
         #         #Confirma o Item selecionado
-        #         pgui.moveTo(1440,680)
-        #         pgui.click()
+        #         pyautogui.moveTo(1440,680)
+        #         pyautogui.click()
         #         time.sleep(1)
                 
         #         #Verifica se possui erro de dinamica
-        #         dinamica = pgui.locateOnScreen('imagens/dinamica2.png', confidence=0.8)
+        #         dinamica = pyautogui.locateOnScreen('imagens/dinamica2.png', confidence=0.8)
                 
         #         #Caso possua quebra o código
         #         if dinamica != None:
-        #             pgui.press('esc')
+        #             pyautogui.press('esc')
         #             quebrar = "Dinâmica"
         #             req = "Dinâmica"
         #             reqs.append(req)
@@ -228,21 +373,21 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
         #             break
                 
         #         #pula as telas de aviso
-        #         pgui.moveTo(1440,720)
-        #         pgui.click()            
+        #         pyautogui.moveTo(1440,720)
+        #         pyautogui.click()            
         #         time.sleep(1)
                 
         #         #Pula a tela de confirmação se houver
-        #         confirmacao = pgui.locateOnScreen('imagens/confirmacao.png', confidence=0.8)
+        #         confirmacao = pyautogui.locateOnScreen('imagens/confirmacao.png', confidence=0.8)
         #         if confirmacao == None:
-        #             pgui.press(['enter', 'enter'])
+        #             pyautogui.press(['enter', 'enter'])
         #         else:
-        #             pgui.press('enter')
+        #             pyautogui.press('enter')
                 
         #         #Armazena o número da Req
-        #         pgui.moveTo(100,210)
-        #         pgui.doubleClick()
-        #         pgui.hotkey('ctrl','c')
+        #         pyautogui.moveTo(100,210)
+        #         pyautogui.doubleClick()
+        #         pyautogui.hotkey('ctrl','c')
         #         req = pyperclip.paste()
         #         req = req[:7]
                 
@@ -254,144 +399,144 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
         #         req_anterior = req
 
         #         #Clica em editar Req
-        #         pgui.moveTo(700,125)
-        #         pgui.click()
+        #         pyautogui.moveTo(700,125)
+        #         pyautogui.click()
         #         time.sleep(0.5)
                 
         #         #ajusta para OR e altera a data e horário de saída
-        #         pgui.moveTo(300,210)
-        #         pgui.click()
+        #         pyautogui.moveTo(300,210)
+        #         pyautogui.click()
         #         time.sleep(0.5)
-        #         pgui.write("OR")
-        #         pgui.press('enter')
+        #         pyautogui.write("OR")
+        #         pyautogui.press('enter')
         #         time.sleep(0.5)
-        #         pgui.press(['tab', 'tab'])
+        #         pyautogui.press(['tab', 'tab'])
                 
         #         #incluir data de produção
-        #         pgui.write(data_producao)
-        #         pgui.press('tab')
-        #         pgui.write("163000")
+        #         pyautogui.write(data_producao)
+        #         pyautogui.press('tab')
+        #         pyautogui.write("163000")
         #         time.sleep(0.5)
                 
         #         #verifica se cliente possui cadastro
-        #         pgui.moveTo(500,270)
-        #         pgui.click()
+        #         pyautogui.moveTo(500,270)
+        #         pyautogui.click()
         #         time.sleep(0.5)
-        #         pgui.moveTo(520,250)
-        #         pgui.doubleClick()
+        #         pyautogui.moveTo(520,250)
+        #         pyautogui.doubleClick()
         #         time.sleep(0.5)
-        #         pgui.press('del')
-        #         pgui.write(cpf_cli)
-        #         pgui.press('enter')
+        #         pyautogui.press('del')
+        #         pyautogui.write(cpf_cli)
+        #         pyautogui.press('enter')
         #         time.sleep(1)
-        #         pgui.press('enter')
+        #         pyautogui.press('enter')
         #         time.sleep(1)
                 
         #         #verifica se cliente possui cadastro
-        #         button = pgui.locateOnScreen('imagens/referencia.png', confidence=0.8)
+        #         button = pyautogui.locateOnScreen('imagens/referencia.png', confidence=0.8)
                 
         #         #caso o cliente tenha cadastro
         #         if button != None:
         #             #Sai da tela de consulta de CPF
-        #             pgui.press('esc')
+        #             pyautogui.press('esc')
         #             time.sleep(0.5)
                     
         #             #Cria o cadastro do cliente
-        #             funcoes_pgui.cadastro(nome_cli, cpf_cli, telefone)
+        #             funcoes_pyautogui.cadastro(nome_cli, cpf_cli, telefone)
                 
         #         #ajusta a quantidade
         #         time.sleep(1)   
-        #         pgui.moveTo(330,400)
-        #         pgui.doubleClick()
+        #         pyautogui.moveTo(330,400)
+        #         pyautogui.doubleClick()
         #         time.sleep(0.5)
-        #         pgui.write(qtd)
+        #         pyautogui.write(qtd)
         #         time.sleep(1)
                 
         #         #calcula
-        #         pgui.press('F9')
+        #         pyautogui.press('F9')
         #         time.sleep(1)
                 
         #         #Verifica se possui mensagem de produto incompativel
-        #         produto_incompativel = pgui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
+        #         produto_incompativel = pyautogui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
                 
-        #         pgui.press('enter')
-        #         pgui.moveTo(x=950, y=660)
-        #         pgui.click()
+        #         pyautogui.press('enter')
+        #         pyautogui.moveTo(x=950, y=660)
+        #         pyautogui.click()
         #         time.sleep(1)
                 
         #         #grava a req
-        #         pgui.hotkey('Alt', 'G')
+        #         pyautogui.hotkey('Alt', 'G')
         #         time.sleep(1)
                 
         #         #Verifica se possui mensagem de produto incompatível
-        #         funcoes_pgui.incompativel(produto_incompativel)
+        #         funcoes_pyautogui.incompativel(produto_incompativel)
         #         time.sleep(1)
                 
         #         #Valida se a req está sem estoque
-        #         sem_estoque = pgui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
-        #         funcoes_pgui.estoque(sem_estoque)
+        #         sem_estoque = pyautogui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
+        #         funcoes_pyautogui.estoque(sem_estoque)
         #         time.sleep(0.5)
                 
         #         #marca como não entregar
         #         time.sleep(1)
-        #         pgui.press('right')
-        #         pgui.press('enter')
+        #         pyautogui.press('right')
+        #         pyautogui.press('enter')
         #         time.sleep(1)
-        #         pgui.moveTo(1200,730)
-        #         pgui.click()
+        #         pyautogui.moveTo(1200,730)
+        #         pyautogui.click()
         #         time.sleep(1) 
                 
-        #         if cod_item in funcoes_pgui.kits:
+        #         if cod_item in funcoes_pyautogui.kits:
         #             #Se o item for Tratamento para unhas ajusta a quantidade da outra sequencial                
-        #             pgui.moveTo(145,135)
-        #             pgui.click()
+        #             pyautogui.moveTo(145,135)
+        #             pyautogui.click()
         #             time.sleep(0.5)
                     
         #             #Clica em editar Req
-        #             pgui.moveTo(700,125)
-        #             pgui.click()
+        #             pyautogui.moveTo(700,125)
+        #             pyautogui.click()
         #             time.sleep(0.5)
                     
         #             #ajusta a quantidade    
-        #             pgui.moveTo(330,400)
-        #             pgui.doubleClick()
-        #             pgui.write(qtd)
+        #             pyautogui.moveTo(330,400)
+        #             pyautogui.doubleClick()
+        #             pyautogui.write(qtd)
         #             time.sleep(0.5)
                     
         #             #calcula
-        #             pgui.press('F9')
+        #             pyautogui.press('F9')
         #             time.sleep(1)
                     
         #             #Verifica se possui mensagem de produto incompativel
-        #             produto_incompativel = pgui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
+        #             produto_incompativel = pyautogui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
         #             time.sleep(0.5)
                     
         #             #Pula as telas de confirmação
-        #             pgui.press('enter')
-        #             pgui.moveTo(x=950, y=660)
-        #             pgui.click()
+        #             pyautogui.press('enter')
+        #             pyautogui.moveTo(x=950, y=660)
+        #             pyautogui.click()
         #             time.sleep(1)
                     
         #             #grava a req
-        #             pgui.hotkey('Alt', 'G')
+        #             pyautogui.hotkey('Alt', 'G')
         #             time.sleep(0.5)
                     
         #             #Verifica se possui mensagem de produto incompativel
-        #             funcoes_pgui.incompativel(produto_incompativel)
+        #             funcoes_pyautogui.incompativel(produto_incompativel)
         #             time.sleep(1)
                     
         #             #Valida se a req está sem estoque
-        #             sem_estoque = pgui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
+        #             sem_estoque = pyautogui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
         #             time.sleep(0.5)
                     
         #             #Verifica se aparece a tela de login de sem estoque
-        #             funcoes_pgui.estoque(sem_estoque)
+        #             funcoes_pyautogui.estoque(sem_estoque)
         #             time.sleep(0.5)
                     
         #             #fecha a tela
         #             time.sleep(1)
-        #             pgui.moveTo(1220,730)
-        #             pgui.click()
+        #             pyautogui.moveTo(1220,730)
+        #             pyautogui.click()
         #         break
         # # Caso a req seja do mesmo pedido, inclui uma nova sequencial
         # else:
@@ -402,147 +547,149 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
         #             quebrar == "Dinâmica"
                 
         #         #Clica no botão de Incluir Normal
-        #         pgui.moveTo(450,130)
-        #         pgui.click()
+        #         pyautogui.moveTo(450,130)
+        #         pyautogui.click()
         #         time.sleep(0.5)
                 
         #         #clica em "Sequencial - Via outra requisição"
-        #         pgui.moveTo(245,370)
-        #         pgui.click()
+        #         pyautogui.moveTo(245,370)
+        #         pyautogui.click()
         #         time.sleep(0.5)
                 
         #         #Clica no Botão OK
-        #         pgui.moveTo(440,780)
-        #         pgui.click()
+        #         pyautogui.moveTo(440,780)
+        #         pyautogui.click()
         #         time.sleep(0.5)
                 
         #         #Inclui o número da req
-        #         pgui.moveTo(440,330)
-        #         pgui.doubleClick()
-        #         pgui.press('backspace')
+        #         pyautogui.moveTo(440,330)
+        #         pyautogui.doubleClick()
+        #         pyautogui.press('backspace')
         #         time.sleep(0.5)
-        #         pgui.write(cod_item)
-        #         pgui.press('enter')
+        #         pyautogui.write(cod_item)
+        #         pyautogui.press('enter')
         #         time.sleep(1)
                 
-        #         funcoes_pgui.tratamento(cod_item)
+        #         funcoes_pyautogui.tratamento(cod_item)
         #         time.sleep(0.5)
                 
         #         #Confirma o item selecionado
-        #         pgui.moveTo(1440,680)
-        #         pgui.click()
+        #         pyautogui.moveTo(1440,680)
+        #         pyautogui.click()
         #         time.sleep(1)
                 
-        #         dinamica2 = pgui.locateOnScreen("imagens/dinamica2.png", confidence=0.9)
+        #         dinamica2 = pyautogui.locateOnScreen("imagens/dinamica2.png", confidence=0.9)
         #         if dinamica2 != None:
-        #             pgui.press("enter")
+        #             pyautogui.press("enter")
         #             quebrar = "Dinâmica"
         #             req = "SEQ-Dinamica"
         #             break
                 
         #         #Pula a tela de aviso
-        #         pgui.moveTo(1440,720)
-        #         pgui.click()            
+        #         pyautogui.moveTo(1440,720)
+        #         pyautogui.click()            
         #         time.sleep(1)
                 
         #         #Clica em editar Req
-        #         pgui.moveTo(700,125)
-        #         pgui.click()
+        #         pyautogui.moveTo(700,125)
+        #         pyautogui.click()
         #         time.sleep(0.5)
                 
         #         #ajusta a quantidade    
-        #         pgui.moveTo(330,400)
-        #         pgui.doubleClick()
-        #         pgui.write(qtd)
+        #         pyautogui.moveTo(330,400)
+        #         pyautogui.doubleClick()
+        #         pyautogui.write(qtd)
         #         time.sleep(0.5)
                 
         #         #calcula
-        #         pgui.press('F9')
+        #         pyautogui.press('F9')
         #         time.sleep(1)
                 
-        #         produto_incompativel = pgui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
+        #         produto_incompativel = pyautogui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
                 
         #         #Pula a tela de produto incompatível
-        #         pgui.press('enter')
-        #         pgui.moveTo(x=950, y=660)
-        #         pgui.click()
+        #         pyautogui.press('enter')
+        #         pyautogui.moveTo(x=950, y=660)
+        #         pyautogui.click()
         #         time.sleep(1)
                 
         #         #grava a req
-        #         pgui.hotkey('Alt', 'G')
+        #         pyautogui.hotkey('Alt', 'G')
         #         time.sleep(0.5)
                 
-        #         funcoes_pgui.incompativel(produto_incompativel)
+        #         funcoes_pyautogui.incompativel(produto_incompativel)
         #         time.sleep(0.5)
                 
         #         #Valida se a req está sem estoque
-        #         sem_estoque = pgui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
+        #         sem_estoque = pyautogui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
         #         time.sleep(0.5)
                 
-        #         funcoes_pgui.estoque(sem_estoque)
+        #         funcoes_pyautogui.estoque(sem_estoque)
         #         time.sleep(0.5)
                 
         #         #fecha a tela
-        #         pgui.moveTo(1220,730)
-        #         pgui.click()
+        #         pyautogui.moveTo(1220,730)
+        #         pyautogui.click()
         #         time.sleep(0.5)
                 
-        #         if cod_item in funcoes_pgui.kits:
+        #         if cod_item in funcoes_pyautogui.kits:
         #             #Se o item for Tratamento para unhas ajusta a quantidade da outra sequencial
-        #             pgui.moveTo(145,135)
-        #             pgui.click()
+        #             pyautogui.moveTo(145,135)
+        #             pyautogui.click()
         #             time.sleep(0.5)
                     
         #             #Clica em editar Req
-        #             pgui.moveTo(700,125)
-        #             pgui.click()
+        #             pyautogui.moveTo(700,125)
+        #             pyautogui.click()
         #             time.sleep(0.5)
                     
         #             #ajusta a quantidade    
-        #             pgui.moveTo(330,400)
-        #             pgui.doubleClick()
-        #             pgui.write(qtd)
+        #             pyautogui.moveTo(330,400)
+        #             pyautogui.doubleClick()
+        #             pyautogui.write(qtd)
         #             time.sleep(0.5)
                     
         #             #calcula
-        #             pgui.press('F9')
+        #             pyautogui.press('F9')
         #             time.sleep(1)
                     
         #             #Verifica se possui mensagem de produto incompativel
-        #             produto_incompativel = pgui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
+        #             produto_incompativel = pyautogui.locateOnScreen('imagens/prod_incomp.png', confidence= 0.8)
         #             time.sleep(0.5)
                     
         #             #Pula a tela de produto incompatível e 
-        #             pgui.press('enter')
-        #             pgui.moveTo(x=950, y=660)
-        #             pgui.click()
+        #             pyautogui.press('enter')
+        #             pyautogui.moveTo(x=950, y=660)
+        #             pyautogui.click()
         #             time.sleep(1)
                     
         #             #grava a req
-        #             pgui.hotkey('Alt', 'G')
+        #             pyautogui.hotkey('Alt', 'G')
         #             time.sleep(0.5)
                     
         #             #Verifica se possui mensagem de produto incompativel
-        #             funcoes_pgui.incompativel(produto_incompativel)
+        #             funcoes_pyautogui.incompativel(produto_incompativel)
         #             time.sleep(0.5)
                     
         #             #Valida se a req está sem estoque
-        #             sem_estoque = pgui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
+        #             sem_estoque = pyautogui.locateOnScreen('imagens/sem-estoque.png', confidence= 0.8)
         #             time.sleep(0.5)
                     
         #             #Verifica se possui mensagem de sem estoque
-        #             funcoes_pgui.estoque(sem_estoque)
+        #             funcoes_pyautogui.estoque(sem_estoque)
         #             time.sleep(0.5)
                     
         #             #fecha a tela
         #             time.sleep(1)
-        #             pgui.moveTo(1220,730)
-        #             pgui.click()
+        #             pyautogui.moveTo(1220,730)
+        #             pyautogui.click()
         #             time.sleep(0.5)
         #         break
         # #Armazena o número do pedido como o anterior para verificação
         # num_pedido_ant = num_ped
-        
+
+
+    print('Tarefa concluída!') 
     #     #Armazena a hora para criação de log
     #     hora = datetime.now()
         

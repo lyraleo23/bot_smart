@@ -13,6 +13,7 @@ from smartphar import open_smartphar, login_smartphar, open_receitas_screen
 import ajuste_dataframe
 from smartphar import filter_manipulados, insert_orders_smartphar
 
+
 def select_folder(folder_label):
     folder_selected = filedialog.askdirectory()
     folder_label.config(text=folder_selected)
@@ -105,7 +106,7 @@ def build_dataframe(folder_path, unmanufactured_products):
     return total_pedidos, total_requisicoes
         
 
-def include_reqs(folder_path, sector_var, production_branch):
+def include_reqs(folder_path, sector_var, production_branch, production_date):
     # Filter orders
     smart_filtered_orders = filter_manipulados(folder_path)
     
@@ -119,7 +120,7 @@ def include_reqs(folder_path, sector_var, production_branch):
     time.sleep(2)
 
     # Insert orders
-    insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch)
+    insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch, production_date)
 
 
 def main():
@@ -146,8 +147,20 @@ def main():
 
     def update_production_date(event):
         production_date.set(cal.get_date())
-        print(production_date.get())
+        date = production_date.get().split('/')
+        month = date[0]
+        day = date[1]
+        year = date[2]
 
+        if len(day) == 1:
+            day = '0' + day
+        if len(month) == 1:
+            month = '0' + month
+        if len(year) == 2:
+            year = '20' + year
+
+        production_date.set(f'{day}{month}{year}')
+        print(production_date.get())
     cal.bind("<<CalendarSelected>>", update_production_date)
 
     #Rótulos de quantidades de pedidos com base na analise dos pedidos
@@ -173,7 +186,7 @@ def main():
     production_branch_menu.pack(pady=5)
 
     # Run button
-    merge_button = tk.Button(root, text="Run", command=lambda: include_reqs(folder_path.get(), sector_var.get(), production_branch_var.get()))
+    merge_button = tk.Button(root, text="Run", command=lambda: include_reqs(folder_path.get(), sector_var.get(), production_branch_var.get(), production_date.get()))
     merge_button.pack(pady=20)
     
     root.mainloop()
