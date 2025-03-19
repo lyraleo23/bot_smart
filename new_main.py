@@ -11,7 +11,7 @@ from smartphar import open_smartphar, login_smartphar, open_receitas_screen
 
 # Legado
 import ajuste_dataframe
-from smartphar import filter_manipulados, insert_orders_smartphar
+from smartphar import insert_orders_smartphar
 
 
 def select_folder(folder_label):
@@ -65,7 +65,6 @@ def get_unmanufactured_products():
     response_semi = pd.json_normalize(response_semi['data'])
     response_industrializados = requests.get("https://api.fmiligrama.com/produtos?tipoInterno=Industrializado").json()
     response_industrializados = pd.json_normalize(response_industrializados['data'])
-
     return pd.concat([response_semi, response_industrializados])
 
 
@@ -85,6 +84,7 @@ def build_dataframe(folder_path, unmanufactured_products):
 
     #Mescla a planilha de pedidos com a base de dados para filtrar os pedidos semi-acabados
     filtered_orders = pd.merge(orders, unmanufactured_products, left_on="Código (SKU)", right_on="codigo", how="left")
+    filtered_orders = filtered_orders.sort_values(by='Número do pedido', ascending=True)
 
     #Ajusta os dados do dataframe
     ajuste_dataframe.ajuste_excel(filtered_orders)
@@ -104,7 +104,19 @@ def build_dataframe(folder_path, unmanufactured_products):
 
     filtered_orders.to_excel(folder_path + "/" + 'filtered_orders.xlsx', index=False)
     return total_pedidos, total_requisicoes
-        
+
+
+def filter_manipulados(folder_path):
+    print('filter_manipulados')
+    # read filtered_orders.xslx file
+    filtered_orders = pd.read_excel(folder_path + "/" + 'filtered_orders.xlsx', sheet_name='Sheet1')
+
+    # Filter only the orders that need to be included in smartphar
+    smart_filtered_orders = filtered_orders["tipoInterno"] == "manipulado"
+    smart_filtered_orders = filtered_orders.loc[smart_filtered_orders]
+
+    return smart_filtered_orders
+
 
 def include_reqs(folder_path, sector_var, production_branch, production_date):
     # Filter orders
@@ -121,6 +133,15 @@ def include_reqs(folder_path, sector_var, production_branch, production_date):
 
     # Insert orders
     insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch, production_date)
+
+    # Create a new window to indicate completion
+    completed_window = tk.Toplevel()
+    completed_window.title("Status")
+    completed_window.attributes('-topmost', True)  # Make the window appear above all others
+    completed_label = tk.Label(completed_window, text="CONCLUIDO", font=("Helvetica", 70))
+    completed_label.pack(pady=20)
+    ok_button = tk.Button(completed_window, text="OK", command=completed_window.destroy)
+    ok_button.pack(pady=10)
 
 
 def main():
