@@ -15,21 +15,21 @@ load_dotenv()
 TOKEN_MILIAPP = os.getenv('TOKEN_MILIAPP')
 LOGIN_SMARTPHAR = os.getenv('LOGIN_SMARTPHAR')
 PASSWORD_SMARTPHAR = str(os.getenv('PASSWORD_SMARTPHAR'))
-pyautogui.PAUSE = 0.3
+pyautogui.PAUSE = 0.1
 
 
 def open_smartphar():
     print('open_smartphar')
     # Windows Run
     pyautogui.hotkey('win', 'r')
-    pyautogui.write(r"\\10.1.1.5\j\smartpharmacy\SmartPhar.exe")
+    pyautogui.write(r"\\10.1.1.5\j\Smart-VPN\SmartPhar.exe")
     pyautogui.press('enter')
     time.sleep(1.5)
     pyautogui.press(['left', 'enter'])
     time.sleep(3)
 
 
-def login_smartphar(production_branch):
+def login_smartphar(production_branch, sector_var):
     print('login_smartphar')
     # Insert username
     pyautogui.write(LOGIN_SMARTPHAR)
@@ -40,9 +40,13 @@ def login_smartphar(production_branch):
     pyautogui.press('tab')
 
     # Select branch
-    if production_branch == '100':
+    if production_branch == '100' and sector_var == 'Site':
         pyautogui.write
         pyautogui.press('down', presses=5)
+        pyautogui.press('enter')
+    elif production_branch == '100' and sector_var == 'Manual':
+        pyautogui.write
+        pyautogui.press('down', presses=6)
         pyautogui.press('enter')
     elif production_branch == '600':
         pyautogui.write
@@ -71,13 +75,13 @@ def click_incluir_normal():
 
 def click_nova_receita_via_outra_requisicao():
     print('click_nova_receita_via_outra_requisicao')
-    pyautogui.press('down', presses=3, interval=0.3)
+    pyautogui.press('down', presses=3)
     pyautogui.press("enter")
 
 
 def click_sequencial_outra_requisicao():
     print('click_sequencial_outra_requisicao')
-    pyautogui.press('down', presses=2, interval=0.3)
+    pyautogui.press('down', presses=2)
     pyautogui.press("enter")
 
 
@@ -93,27 +97,18 @@ def verificar_kit(sku):
 def pesquisar_requisicao_inclusao_via_outra_receita(sku):
     print('pesquisar_requisicao_inclusao_via_outra_receita')
     time.sleep(1)
-    try:
-        pesquisa_requisicao = pyautogui.locateOnScreen('imagens/pesquisa_requisicao_3.PNG', confidence=0.9)
-    except:
-        pesquisa_requisicao = None
-    print(f'pesquisa_requisicao: {pesquisa_requisicao}')
-
-    if pesquisa_requisicao == None:
-        pyautogui.press('tab', presses=4, interval=0.3)
-
-    # pyautogui.moveTo(fied_receita_via_outra_requisicao_numero_req_location['x'], fied_receita_via_outra_requisicao_numero_req_location['y'])
+    pyautogui.moveTo(fied_receita_via_outra_requisicao_numero_req_location['x'], fied_receita_via_outra_requisicao_numero_req_location['y'])
     pyautogui.doubleClick()
     pyautogui.press('backspace')
     pyautogui.write(sku)
-    time.sleep(0.3)
-    pyautogui.press('enter', presses=2, interval=0.3)
+    time.sleep(0.1)
+    pyautogui.press('enter', presses=2)
     time.sleep(1)
 
 
 def verify_max_dosage():
     print('verify_max_dosage')
-    time.sleep(1.5)
+    time.sleep(1)
     try:
         max_dosage = pyautogui.locateOnScreen('imagens/max_dosage.PNG', confidence=0.8)
     except Exception as e:
@@ -127,7 +122,7 @@ def verify_max_dosage():
 
 def verify_min_dosage():
     print('verify_min_dosage')
-    time.sleep(1.5)
+    time.sleep(1)
     try:
         min_dosage = pyautogui.locateOnScreen('imagens/min_dosage.PNG', confidence=0.8)
     except Exception as e:
@@ -159,7 +154,7 @@ def altera_data_hora_entrega(production_date):
     
     # Hora de entrega fix em 16:30
     pyautogui.write('163000')
-    time.sleep(0.5)
+    time.sleep(0.1)
 
 
 def search_customer(cpf):
@@ -182,7 +177,7 @@ def search_customer(cpf):
         pyautogui.press('esc')
     else:
         pyautogui.press('enter')
-    time.sleep(0.2)
+    time.sleep(0.1)
 
     return customer_verification
 
@@ -193,18 +188,18 @@ def cadastrar_cliente(name, cpf, phone):
     time.sleep(1)
     pyautogui.press('tab')
     pyautogui.write(name)
-    pyautogui.press('tab', presses=4, interval=0.3)
+    pyautogui.press('tab', presses=4)
     pyautogui.write(cpf)
-    pyautogui.press('tab', presses=6, interval=0.3)
+    pyautogui.press('tab', presses=6)
     pyautogui.write('M')
-    pyautogui.press('tab', presses=9, interval=0.3)
+    pyautogui.press('tab', presses=9)
     pyautogui.write(phone)
     pyautogui.hotkey('alt', 'g')
 
 
 def incluir_crm(crm):
     print('incluir_crm')
-    pyautogui.press('tab', presses=8, interval=0.3)
+    pyautogui.press('tab', presses=8)
     pyautogui.write(crm)
     pyautogui.press('enter')
     time.sleep(1)
@@ -212,20 +207,19 @@ def incluir_crm(crm):
 
 def ajustar_quantidade(qtd):
     print('ajustar_quantidade')
-    pyautogui.press('tab', presses=12, interval=0.3)
+    pyautogui.press('tab', presses=12)
     pyautogui.write(qtd)
     pyautogui.press('F9')
-    time.sleep(0.5)
-    pyautogui.press('enter', presses=3, interval=0.3)
+    time.sleep(0.3)
+    pyautogui.press('enter', presses=3)
 
 
 def salva_req_o():
     print('salva_req_o')
-    time.sleep(2)
+    time.sleep(0.5)
     pyautogui.hotkey('alt', 'g')
-    time.sleep(1)
+    time.sleep(0.5)
     pyautogui.press('enter')
-    time.sleep(1)
     
     # Verifica tela de entrega
     time.sleep(1)
@@ -290,24 +284,24 @@ def save_req():
     print(agenda_compromissos)
 
     if agenda_compromissos != None:
-        pyautogui.press('tab', presses=8, interval=0.3)
+        pyautogui.press('tab', presses=8, interval=0.2)
         pyautogui.press('enter')
 
 
 def ajustar_quantidade_manual(qtd):
     print('ajustar_quantidade_manual')
-    pyautogui.press('tab', presses=4, interval=0.3)
+    pyautogui.press('tab', presses=4)
     pyautogui.write(qtd)
     pyautogui.press('F9')
-    time.sleep(0.5)
-    pyautogui.press('enter', presses=3, interval=0.3)
+    time.sleep(0.3)
+    pyautogui.press('enter', presses=3)
 
 
 def get_req_number():
     print('get_req_number')
     req_number = None
     print('get_req_number')
-    pyautogui.press('tab', presses=11, interval=0.3)
+    pyautogui.press('tab', presses=11)
     pyautogui.hotkey('ctrl', 'c')
     req_number = pyperclip.paste()
     return req_number
@@ -315,7 +309,7 @@ def get_req_number():
 
 def verify_orcamento_realizado():
     print('verify_orcamento_realizado')
-    time.sleep(2)
+    time.sleep(1)
     try:
         orcamento_realizado = pyautogui.locateOnScreen('imagens/orcamento_realizado.PNG', confidence= 0.8)
     except:
@@ -324,7 +318,6 @@ def verify_orcamento_realizado():
 
     if orcamento_realizado != None:
         pyautogui.press('enter')
-        time.sleep(1)
 
 
 def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch, production_date):
@@ -366,7 +359,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
                     # Clica no botão de Incluir Normal
                     time.sleep(1)
                     click_incluir_normal()
-                    time.sleep(1.5)
+                    time.sleep(1)
 
                     # Verifica se está na tela correta
                     tela_incluir = pyautogui.locateOnScreen("imagens/tela_incluir.png", confidence=0.8)
@@ -378,7 +371,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
                 # Caso não esteja na tela correta, abre o smart novamente
                 if tela_incluir == None:
                     open_smartphar()
-                    login_smartphar(production_branch)
+                    login_smartphar(production_branch, sector_var)
                     open_receitas_screen()
                 else:
                     break
@@ -391,7 +384,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
             # Clica no botão de Incluir Normal
             time.sleep(1)
             click_incluir_normal()
-            time.sleep(1.5)
+            time.sleep(1)
 
             try:
                 # Verifica se está na tela correta
@@ -408,7 +401,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
         # Clica em Nova Receita via outra requisição
         print(f'incluindo uma sequencial pedido: {order.order_number}: {order.sku}')
         pesquisar_requisicao_inclusao_via_outra_receita(order.sku)
-        time.sleep(1.5)
+        time.sleep(1)
         previous_order_number = order.order_number
         print('previous_order_number = order.order_number')
         
@@ -436,11 +429,11 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
             # Fecha a tela de erro
             pyautogui.press('esc')
             continue
-        
+
         # Confirma item
         print('confirmando item')
         pyautogui.press('enter')
-        time.sleep(0.5)
+        time.sleep(0.3)
 
         # Verifica dosagem máxima / mínima
         verify_max_dosage()
@@ -481,9 +474,7 @@ def insert_orders_smartphar(smart_filtered_orders, sector_var, production_branch
             transformar_or()
             altera_data_hora_entrega(production_date)
 
-            pyautogui.press('tab', presses=2, interval=0.3)
-            # pyautogui.press('tab')
-            # pyautogui.press('tab')
+            pyautogui.press('tab', presses=2)
 
             customer_verification = search_customer(order.cpf)
             if customer_verification != None:

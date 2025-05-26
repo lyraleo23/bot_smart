@@ -124,7 +124,7 @@ def include_reqs(folder_path, sector_var, production_branch, production_date):
     
     # Open and login to Smartphar
     open_smartphar()
-    login_smartphar(production_branch)
+    login_smartphar(production_branch, sector_var)
     time.sleep(2)
 
     # Open receitas screen
